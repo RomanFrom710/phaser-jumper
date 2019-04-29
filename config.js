@@ -1,13 +1,16 @@
 export default {
   platformStartSpeed: 350,
-  spawnRange: [100, 350],
-  platformSizeRange: [50, 250],
+  holeHeight: 150,
+  platformWidth: 40,
   playerGravity: 900,
   jumpForce: 400,
   playerStartPosition: 200,
-  jumps: 2,
+  platformDistance: 700,
+  playerSize: 30,
 
   width: window.innerWidth,
   height: window.innerHeight,
-  background: 0x444444,
+  backgroundColor: 0x444444,
+  platformColor: 0xff0000,
+  playerColor: 0x00ff00,
 };
