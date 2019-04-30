@@ -1,16 +1,23 @@
 export default {
-  platformStartSpeed: 350,
-  holeHeight: 150,
-  platformWidth: 40,
-  playerGravity: 900,
-  jumpForce: 400,
-  playerStartPosition: 200,
-  platformDistance: 700,
-  playerSize: 30,
-
-  width: window.innerWidth,
-  height: window.innerHeight,
-  backgroundColor: 0x444444,
-  platformColor: 0xff0000,
-  playerColor: 0x00ff00,
+  barrier: {
+    color: 0x00ff00,
+    distance: 700,
+    speed: 350,
+    width: 40,
+  },
+  field: {
+    color: 0x444444,
+    height: window.innerHeight,
+    width: window.innerWidth,
+  },
+  hole: {
+    height: 150,
+  },
+  player: {
+    color: 0xff0000,
+    gravity: 900,
+    jumpForce: 400,
+    size: 30,
+    x: 200,
+  },
 };

@@ -1,13 +1,13 @@
-import config from "./config.js";
-import Scene from "./scene.js";
+import config from './config.js';
+import Scene from './scene.js';
 
 new Phaser.Game({
   type: Phaser.AUTO,
-  width: config.width,
-  height: config.height,
+  width: config.field.width,
+  height: config.field.height,
   scene: Scene,
-  backgroundColor: config.backgroundColor,
+  backgroundColor: config.field.color,
   physics: {
-    default: "arcade"
-  }
+    default: 'arcade',
+  },
 });

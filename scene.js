@@ -2,73 +2,84 @@ import config from './config.js';
 
 export default class extends Phaser.Scene {
   create() {
-    this.barrierGroup = this.physics.add.group();
+    this._barrierGroup = this.physics.add.group();
 
-    this.player = this.add.circle(
-      config.playerStartPosition,
-      config.height / 2,
-      config.playerSize,
-      config.playerColor
+    this._player = this.add.circle(
+      config.player.x,
+      config.field.height / 2,
+      config.player.size,
+      config.player.color,
     );
-    this.physics.add.existing(this.player);
-    this.player.body.setGravityY(config.playerGravity);
+    this.physics.add.existing(this._player);
+    this._player.body.setGravityY(config.player.gravity);
 
-    this.input.on('pointerdown', this.jump, this);
+    this.input.on('pointerdown', this._jump, this);
 
     this.physics.add.collider(
-      this.player,
-      this.barrierGroup,
-      this.handleGameOver,
+      this._player,
+      this._barrierGroup,
+      this._handleGameOver,
       null,
       this, // C'mon guys, 5 arguments? This is not WinAPI.
     );
   }
 
+  _jump() {
+    this._player.body.setVelocityY(-config.player.jumpForce);
+  }
+
   update() {
-    const children = this.barrierGroup.getChildren();
-    const lastBarrier = children[children.length - 1];
+    const children = this._barrierGroup.getChildren();
 
-    if (!lastBarrier || config.width - lastBarrier.x >= config.platformDistance) {
-      this.addBarrier(Phaser.Math.Between(0, config.height - config.holeHeight), config.holeHeight);
+    this._tryAddNewBarrier(children[children.length - 1]);
+
+    const oldestBarrier = children[0];
+    if (oldestBarrier.x < -config.barrier.width) {
+      this._removeBarriers(children.slice(0, 2)); // Two oldest are top and bottom.
     }
 
-    if (children[0].x < 0) {
-      this.barrierGroup.remove(children[0], true, true);
-      this.barrierGroup.remove(children[0], true, true);
-    }
-
-    if (this.player.y > config.height || this.player.y < 0) {
-      this.handleGameOver();
+    if (this._player.y > config.field.height || this._player.y < 0) {
+      this._handleGameOver();
     }
   }
 
-  addBarrier(holePosition, holeHeight) {
-    const topBarrier = this.add.rectangle(
-      config.width,
-      0,
-      config.platformWidth,
-      holePosition,
-      config.platformColor,
-    ).setOrigin(0, 0);
-
-    const bottomBarrier = this.add.rectangle(
-      config.width,
-      holePosition + holeHeight,
-      config.platformWidth,
-      config.height - holePosition - holeHeight,
-      config.platformColor,
-    ).setOrigin(0, 0);
-
-    this.barrierGroup
-      .addMultiple([topBarrier, bottomBarrier])
-      .setVelocityX(-config.platformStartSpeed);
+  _removeBarriers(barriers) {
+    barriers.forEach((barrier) => this._barrierGroup.remove(barrier, true, true));
   }
 
-  jump() {
-    this.player.body.setVelocityY(-config.jumpForce);
-  }
-
-  handleGameOver() {
+  _handleGameOver() {
     this.scene.start();
+  }
+
+  _tryAddNewBarrier(lastBarrier) {
+    if (lastBarrier && config.field.width - lastBarrier.x < config.barrier.distance) {
+      return;
+    }
+
+    const holeHeight = config.hole.height;
+    const holePosition = Phaser.Math.Between(0, config.field.height - holeHeight);
+    this._addBarrier(holePosition, holeHeight);
+  }
+
+  _addBarrier(holePosition, holeHeight) {
+    const topBarrier = this._addBarrierRectangle(0, holePosition);
+
+    const bottomBarrierY = holePosition + holeHeight;
+    const bottomBarrierHeight = config.field.height - bottomBarrierY;
+    const bottomBarrier = this._addBarrierRectangle(bottomBarrierY, bottomBarrierHeight);
+
+    this._barrierGroup
+      .addMultiple([topBarrier, bottomBarrier])
+      .setVelocityX(-config.barrier.speed);
+  }
+
+  _addBarrierRectangle(y, height) {
+    return this.add.rectangle(
+      config.field.width,
+      y,
+      config.barrier.width,
+      height,
+      config.barrier.color,
+    ).setOrigin(0, 0)
   }
 }
